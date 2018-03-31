@@ -1,0 +1,65 @@
+﻿@model IEnumerable<AuctionCoordinationTool.Models.Donation>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.DonorID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EstimatedValue)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SuggestedStartingBid)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UnitsOffered)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PotentialTaxBreak)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @ViewBag.Donors[item.DonorID].FullID
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EstimatedValue)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SuggestedStartingBid)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UnitsOffered)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PotentialTaxBreak)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.DonationID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.DonationID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.DonationID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

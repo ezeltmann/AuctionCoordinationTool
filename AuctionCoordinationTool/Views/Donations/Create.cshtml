@@ -1,0 +1,76 @@
+﻿@model AuctionCoordinationTool.Models.Donation
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>Donation</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="@Model.DonorID" class="control-label"></label>
+                <select asp-for="@Model.DonorID" asp-items="@ViewBag.Donors">
+                    <option>Please Select A Donor</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Title" class="control-label"></label>
+                <input asp-for="@Model.Title" class="form-control" />
+                <span asp-validation-for="@Model.Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Description" class="control-label"></label>
+                <textarea asp-for="@Model.Description" class="form-control"></textarea>
+                <span asp-validation-for="@Model.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.EstimatedValue" class="control-label"></label>
+                <input asp-for="@Model.EstimatedValue" class="form-control" />
+                <span asp-validation-for="@Model.EstimatedValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.SuggestedStartingBid" class="control-label"></label>
+                <input asp-for="@Model.SuggestedStartingBid" class="form-control" />
+                <span asp-validation-for="@Model.SuggestedStartingBid" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.UnitsOffered" class="control-label"></label>
+                <input asp-for="@Model.UnitsOffered" class="form-control" />
+                <span asp-validation-for="@Model.UnitsOffered" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="@Model.PotentialTaxBreak" /> @Html.DisplayNameFor(model => model.PotentialTaxBreak)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.DateOfEvent" class="control-label"></label>
+                <input asp-for="@Model.DateOfEvent" class="form-control" />
+                <span asp-validation-for="@Model.DateOfEvent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.RainDate" class="control-label"></label>
+                <input asp-for="@Model.RainDate" class="form-control" />
+                <span asp-validation-for="@Model.RainDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
