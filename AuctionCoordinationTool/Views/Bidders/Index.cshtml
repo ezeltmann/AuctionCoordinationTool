@@ -48,6 +48,9 @@
                 <th>
                     @Html.DisplayNameFor(model => model.EmailAddress)
                 </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FullyPaid)
+                </th>
             <th></th>
         </tr>
     </thead>
@@ -89,6 +92,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.EmailAddress)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FullyPaid)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.BidderId">Edit</a> |

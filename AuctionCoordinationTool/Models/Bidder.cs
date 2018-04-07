@@ -49,6 +49,9 @@ namespace AuctionCoordinationTool.Models
         [Display(Name = "Email Address")]
         public string EmailAddress { get; set; }
 
+        [Display(Name = "Fully Paid")]
+        public bool FullyPaid { get; set; }
+
         [BindNever]
         public string FullName
         {
