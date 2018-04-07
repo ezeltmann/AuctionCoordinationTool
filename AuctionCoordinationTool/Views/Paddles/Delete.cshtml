@@ -1,0 +1,33 @@
+﻿@model AuctionCoordinationTool.Models.Paddle
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Paddle</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.BidderId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BidderId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PaddleNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PaddleNumber)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="PaddleId" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

@@ -1,0 +1,30 @@
+﻿@model AuctionCoordinationTool.Models.Paddle
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Paddle</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.BidderId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BidderId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PaddleNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PaddleNumber)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.PaddleId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

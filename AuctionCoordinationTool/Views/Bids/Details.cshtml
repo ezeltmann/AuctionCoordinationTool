@@ -1,0 +1,48 @@
+﻿@model AuctionCoordinationTool.Models.Bid
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Bid</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.PaddleId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PaddleId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DonationId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DonationId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Units)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Units)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CostPerUnit)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CostPerUnit)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsGuestPass)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsGuestPass)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.BidId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

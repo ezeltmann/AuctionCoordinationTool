@@ -1,0 +1,41 @@
+﻿@model IEnumerable<AuctionCoordinationTool.Models.Paddle>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.BidderId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PaddleNumber)
+                </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.BidderId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PaddleNumber)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.PaddleId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.PaddleId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.PaddleId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,91 @@
+﻿@model AuctionCoordinationTool.Models.Bidder
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>Bidder</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="BidderId" />
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="MemberOrFriend" /> @Html.DisplayNameFor(model => model.MemberOrFriend)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="PrimaryFirstName" class="control-label"></label>
+                <input asp-for="PrimaryFirstName" class="form-control" />
+                <span asp-validation-for="PrimaryFirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PrimaryLastName" class="control-label"></label>
+                <input asp-for="PrimaryLastName" class="form-control" />
+                <span asp-validation-for="PrimaryLastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SecondaryFirstName" class="control-label"></label>
+                <input asp-for="SecondaryFirstName" class="form-control" />
+                <span asp-validation-for="SecondaryFirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SecondaryLastName" class="control-label"></label>
+                <input asp-for="SecondaryLastName" class="form-control" />
+                <span asp-validation-for="SecondaryLastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AddressLine1" class="control-label"></label>
+                <input asp-for="AddressLine1" class="form-control" />
+                <span asp-validation-for="AddressLine1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AddressLine2" class="control-label"></label>
+                <input asp-for="AddressLine2" class="form-control" />
+                <span asp-validation-for="AddressLine2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="City" class="control-label"></label>
+                <input asp-for="City" class="form-control" />
+                <span asp-validation-for="City" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="State" class="control-label"></label>
+                <input asp-for="State" class="form-control" />
+                <span asp-validation-for="State" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ZipCode" class="control-label"></label>
+                <input asp-for="ZipCode" class="form-control" />
+                <span asp-validation-for="ZipCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PhoneNumber" class="control-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmailAddress" class="control-label"></label>
+                <input asp-for="EmailAddress" class="form-control" />
+                <span asp-validation-for="EmailAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

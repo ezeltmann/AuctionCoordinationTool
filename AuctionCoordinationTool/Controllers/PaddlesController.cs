@@ -7,26 +7,24 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AuctionCoordinationTool.Models;
 
-
 namespace AuctionCoordinationTool.Controllers
 {
-    public class DonationsController : Controller
+    public class PaddlesController : Controller
     {
         private readonly AuctionDBContext _context;
 
-        public DonationsController(AuctionDBContext context)
+        public PaddlesController(AuctionDBContext context)
         {
             _context = context;
         }
 
-        // GET: Donations
+        // GET: Paddles
         public async Task<IActionResult> Index()
         {
-            ViewBag.Donors = _context.Donor.ToList().ToDictionary(o => o.DonorID);            
-            return View(await _context.Donation.ToListAsync());
+            return View(await _context.Paddle.ToListAsync());
         }
 
-        // GET: Donations/Details/5
+        // GET: Paddles/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,48 +32,39 @@ namespace AuctionCoordinationTool.Controllers
                 return NotFound();
             }
 
-
-            var donation = await _context.Donation
-                .SingleOrDefaultAsync(m => m.DonationID == id);
-
-            if (donation == null)
+            var paddle = await _context.Paddle
+                .SingleOrDefaultAsync(m => m.PaddleId == id);
+            if (paddle == null)
             {
                 return NotFound();
             }
-            ViewBag.Donor = await _context.Donor.SingleOrDefaultAsync(o => o.DonorID == donation.DonorID);
 
-            return View(donation);
+            return View(paddle);
         }
 
-        // GET: Donations/Create
+        // GET: Paddles/Create
         public IActionResult Create()
-        {                        
-            ViewBag.Donors = new SelectList(_context.Donor.ToList(), "DonorID", "FullID");
+        {
             return View();
         }
 
-        // POST: Donations/Create
+        // POST: Paddles/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DonationID,DonorID,Title,Description,EstimatedValue,SuggestedStartingBid,UnitsOffered,PotentialTaxBreak,DateOfEvent,RainDate")] Donation donation)
+        public async Task<IActionResult> Create([Bind("PaddleId,BidderId,PaddleNumber")] Paddle paddle)
         {
-
             if (ModelState.IsValid)
             {
-                _context.Add(donation);
+                _context.Add(paddle);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                ViewBag.Donors = new SelectList(_context.Donor.ToList(), "DonorID", "FullID");
-                return View();
-            }
+            return View(paddle);
         }
 
-        // GET: Donations/Edit/5
+        // GET: Paddles/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -83,23 +72,22 @@ namespace AuctionCoordinationTool.Controllers
                 return NotFound();
             }
 
-            var donation = await _context.Donation.SingleOrDefaultAsync(m => m.DonationID == id);
-            if (donation == null)
+            var paddle = await _context.Paddle.SingleOrDefaultAsync(m => m.PaddleId == id);
+            if (paddle == null)
             {
                 return NotFound();
             }
-            ViewBag.Donors = new SelectList(_context.Donor.ToList(), "DonorID", "FullID");
-            return View(donation);
+            return View(paddle);
         }
 
-        // POST: Donations/Edit/5
+        // POST: Paddles/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("DonationID,DonorID,Title,Description,EstimatedValue,SuggestedStartingBid,UnitsOffered,PotentialTaxBreak,DateOfEvent,RainDate")] Donation donation)
+        public async Task<IActionResult> Edit(int id, [Bind("PaddleId,BidderId,PaddleNumber")] Paddle paddle)
         {
-            if (id != donation.DonationID)
+            if (id != paddle.PaddleId)
             {
                 return NotFound();
             }
@@ -108,12 +96,12 @@ namespace AuctionCoordinationTool.Controllers
             {
                 try
                 {
-                    _context.Update(donation);
+                    _context.Update(paddle);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DonationExists(donation.DonationID))
+                    if (!PaddleExists(paddle.PaddleId))
                     {
                         return NotFound();
                     }
@@ -124,14 +112,10 @@ namespace AuctionCoordinationTool.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                ViewBag.Donors = new SelectList(_context.Donor.ToList(), "DonorID", "FullID");
-                return View(donation);
-            }
+            return View(paddle);
         }
 
-        // GET: Donations/Delete/5
+        // GET: Paddles/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -139,31 +123,30 @@ namespace AuctionCoordinationTool.Controllers
                 return NotFound();
             }
 
-            var donation = await _context.Donation
-                .SingleOrDefaultAsync(m => m.DonationID == id);
-            if (donation == null)
+            var paddle = await _context.Paddle
+                .SingleOrDefaultAsync(m => m.PaddleId == id);
+            if (paddle == null)
             {
                 return NotFound();
             }
-            ViewBag.Donor = await _context.Donor.SingleOrDefaultAsync(o => o.DonorID == donation.DonorID);
 
-            return View(donation);
+            return View(paddle);
         }
 
-        // POST: Donations/Delete/5
+        // POST: Paddles/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var donation = await _context.Donation.SingleOrDefaultAsync(m => m.DonationID == id);
-            _context.Donation.Remove(donation);
+            var paddle = await _context.Paddle.SingleOrDefaultAsync(m => m.PaddleId == id);
+            _context.Paddle.Remove(paddle);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DonationExists(int id)
+        private bool PaddleExists(int id)
         {
-            return _context.Donation.Any(e => e.DonationID == id);
+            return _context.Paddle.Any(e => e.PaddleId == id);
         }
     }
 }

@@ -7,26 +7,24 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AuctionCoordinationTool.Models;
 
-
 namespace AuctionCoordinationTool.Controllers
 {
-    public class DonationsController : Controller
+    public class BiddersController : Controller
     {
         private readonly AuctionDBContext _context;
 
-        public DonationsController(AuctionDBContext context)
+        public BiddersController(AuctionDBContext context)
         {
             _context = context;
         }
 
-        // GET: Donations
+        // GET: Bidders
         public async Task<IActionResult> Index()
         {
-            ViewBag.Donors = _context.Donor.ToList().ToDictionary(o => o.DonorID);            
-            return View(await _context.Donation.ToListAsync());
+            return View(await _context.Bidder.ToListAsync());
         }
 
-        // GET: Donations/Details/5
+        // GET: Bidders/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,48 +32,39 @@ namespace AuctionCoordinationTool.Controllers
                 return NotFound();
             }
 
-
-            var donation = await _context.Donation
-                .SingleOrDefaultAsync(m => m.DonationID == id);
-
-            if (donation == null)
+            var bidder = await _context.Bidder
+                .SingleOrDefaultAsync(m => m.BidderId == id);
+            if (bidder == null)
             {
                 return NotFound();
             }
-            ViewBag.Donor = await _context.Donor.SingleOrDefaultAsync(o => o.DonorID == donation.DonorID);
 
-            return View(donation);
+            return View(bidder);
         }
 
-        // GET: Donations/Create
+        // GET: Bidders/Create
         public IActionResult Create()
-        {                        
-            ViewBag.Donors = new SelectList(_context.Donor.ToList(), "DonorID", "FullID");
+        {
             return View();
         }
 
-        // POST: Donations/Create
+        // POST: Bidders/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DonationID,DonorID,Title,Description,EstimatedValue,SuggestedStartingBid,UnitsOffered,PotentialTaxBreak,DateOfEvent,RainDate")] Donation donation)
+        public async Task<IActionResult> Create([Bind("BidderId,MemberOrFriend,PrimaryFirstName,PrimaryLastName,SecondaryFirstName,SecondaryLastName,AddressLine1,AddressLine2,City,State,ZipCode,PhoneNumber,EmailAddress")] Bidder bidder)
         {
-
             if (ModelState.IsValid)
             {
-                _context.Add(donation);
+                _context.Add(bidder);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                ViewBag.Donors = new SelectList(_context.Donor.ToList(), "DonorID", "FullID");
-                return View();
-            }
+            return View(bidder);
         }
 
-        // GET: Donations/Edit/5
+        // GET: Bidders/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -83,23 +72,22 @@ namespace AuctionCoordinationTool.Controllers
                 return NotFound();
             }
 
-            var donation = await _context.Donation.SingleOrDefaultAsync(m => m.DonationID == id);
-            if (donation == null)
+            var bidder = await _context.Bidder.SingleOrDefaultAsync(m => m.BidderId == id);
+            if (bidder == null)
             {
                 return NotFound();
             }
-            ViewBag.Donors = new SelectList(_context.Donor.ToList(), "DonorID", "FullID");
-            return View(donation);
+            return View(bidder);
         }
 
-        // POST: Donations/Edit/5
+        // POST: Bidders/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("DonationID,DonorID,Title,Description,EstimatedValue,SuggestedStartingBid,UnitsOffered,PotentialTaxBreak,DateOfEvent,RainDate")] Donation donation)
+        public async Task<IActionResult> Edit(int id, [Bind("BidderId,MemberOrFriend,PrimaryFirstName,PrimaryLastName,SecondaryFirstName,SecondaryLastName,AddressLine1,AddressLine2,City,State,ZipCode,PhoneNumber,EmailAddress")] Bidder bidder)
         {
-            if (id != donation.DonationID)
+            if (id != bidder.BidderId)
             {
                 return NotFound();
             }
@@ -108,12 +96,12 @@ namespace AuctionCoordinationTool.Controllers
             {
                 try
                 {
-                    _context.Update(donation);
+                    _context.Update(bidder);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DonationExists(donation.DonationID))
+                    if (!BidderExists(bidder.BidderId))
                     {
                         return NotFound();
                     }
@@ -124,14 +112,10 @@ namespace AuctionCoordinationTool.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                ViewBag.Donors = new SelectList(_context.Donor.ToList(), "DonorID", "FullID");
-                return View(donation);
-            }
+            return View(bidder);
         }
 
-        // GET: Donations/Delete/5
+        // GET: Bidders/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -139,31 +123,30 @@ namespace AuctionCoordinationTool.Controllers
                 return NotFound();
             }
 
-            var donation = await _context.Donation
-                .SingleOrDefaultAsync(m => m.DonationID == id);
-            if (donation == null)
+            var bidder = await _context.Bidder
+                .SingleOrDefaultAsync(m => m.BidderId == id);
+            if (bidder == null)
             {
                 return NotFound();
             }
-            ViewBag.Donor = await _context.Donor.SingleOrDefaultAsync(o => o.DonorID == donation.DonorID);
 
-            return View(donation);
+            return View(bidder);
         }
 
-        // POST: Donations/Delete/5
+        // POST: Bidders/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var donation = await _context.Donation.SingleOrDefaultAsync(m => m.DonationID == id);
-            _context.Donation.Remove(donation);
+            var bidder = await _context.Bidder.SingleOrDefaultAsync(m => m.BidderId == id);
+            _context.Bidder.Remove(bidder);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DonationExists(int id)
+        private bool BidderExists(int id)
         {
-            return _context.Donation.Any(e => e.DonationID == id);
+            return _context.Bidder.Any(e => e.BidderId == id);
         }
     }
 }
