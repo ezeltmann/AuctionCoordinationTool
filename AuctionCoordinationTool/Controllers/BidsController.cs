@@ -21,6 +21,9 @@ namespace AuctionCoordinationTool.Controllers
         // GET: Bids
         public async Task<IActionResult> Index()
         {
+            ViewBag.Paddles = _context.Paddle.ToList().ToDictionary(o => o.PaddleId);
+            ViewBag.Donations = _context.Donation.ToList().ToDictionary(o => o.DonationID);
+
             return View(await _context.Bid.ToListAsync());
         }
 
@@ -39,12 +42,17 @@ namespace AuctionCoordinationTool.Controllers
                 return NotFound();
             }
 
+            ViewBag.Paddle = await _context.Paddle.SingleOrDefaultAsync(o => o.PaddleId == bid.PaddleId);
+            ViewBag.Donation = await _context.Donation.SingleOrDefaultAsync(o => o.DonationID == bid.DonationId);
+
             return View(bid);
         }
 
         // GET: Bids/Create
         public IActionResult Create()
         {
+            ViewBag.Paddles = new SelectList(_context.Paddle.ToList(), "PaddleId", "PaddleNumber");
+            ViewBag.Donations = new SelectList(_context.Donation.ToList(), "DonationID", "Title");
             return View();
         }
 
@@ -61,7 +69,13 @@ namespace AuctionCoordinationTool.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(bid);
+            else
+            {
+                ViewBag.Paddles = new SelectList(_context.Paddle.ToList(), "PaddleId", "PaddleNumber");
+                ViewBag.Donations = new SelectList(_context.Donation.ToList(), "DonationID", "Title");
+                return View(bid);
+            }
+            
         }
 
         // GET: Bids/Edit/5
@@ -77,6 +91,10 @@ namespace AuctionCoordinationTool.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.Paddles = new SelectList(_context.Paddle.ToList(), "PaddleId", "PaddleNumber");
+            ViewBag.Donations = new SelectList(_context.Donation.ToList(), "DonationID", "Title");
+
             return View(bid);
         }
 
@@ -112,7 +130,13 @@ namespace AuctionCoordinationTool.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(bid);
+            else
+            {
+                ViewBag.Paddles = new SelectList(_context.Paddle.ToList(), "PaddleId", "PaddleNumber");
+                ViewBag.Donations = new SelectList(_context.Donation.ToList(), "DonationID", "Title");
+
+                return View(bid);
+            }
         }
 
         // GET: Bids/Delete/5
@@ -129,6 +153,9 @@ namespace AuctionCoordinationTool.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.Paddle = await _context.Paddle.SingleOrDefaultAsync(o => o.PaddleId == bid.PaddleId);
+            ViewBag.Donation = await _context.Donation.SingleOrDefaultAsync(o => o.DonationID == bid.DonationId);
 
             return View(bid);
         }

@@ -13,6 +13,7 @@ namespace AuctionCoordinationTool.Models
         public int PaddleId { get; set; }
 
         [ForeignKey("Bidder")]
+        [Display(Name = "Bidder")]
         public int BidderId { get; set; }
 
         [Display(Name = "Paddle Number")]

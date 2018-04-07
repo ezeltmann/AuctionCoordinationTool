@@ -21,6 +21,7 @@ namespace AuctionCoordinationTool.Controllers
         // GET: Paddles
         public async Task<IActionResult> Index()
         {
+            ViewBag.Bidders = _context.Bidder.ToList().ToDictionary(o => o.BidderId);
             return View(await _context.Paddle.ToListAsync());
         }
 
@@ -39,12 +40,14 @@ namespace AuctionCoordinationTool.Controllers
                 return NotFound();
             }
 
+            ViewBag.Bidder = await _context.Bidder.SingleOrDefaultAsync(o => o.BidderId == paddle.BidderId);
             return View(paddle);
         }
 
         // GET: Paddles/Create
         public IActionResult Create()
         {
+            ViewBag.Bidders = new SelectList(_context.Bidder.ToList(), "BidderId", "FullName");
             return View();
         }
 
@@ -61,7 +64,11 @@ namespace AuctionCoordinationTool.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(paddle);
+            else
+            {
+                ViewBag.Bidders = new SelectList(_context.Bidder.ToList(), "BidderId", "FullName");
+                return View(paddle);
+            }
         }
 
         // GET: Paddles/Edit/5
@@ -77,6 +84,7 @@ namespace AuctionCoordinationTool.Controllers
             {
                 return NotFound();
             }
+            ViewBag.Bidders = new SelectList(_context.Bidder.ToList(), "BidderId", "FullName");
             return View(paddle);
         }
 
@@ -112,7 +120,11 @@ namespace AuctionCoordinationTool.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(paddle);
+            else
+            {
+                ViewBag.Bidders = new SelectList(_context.Bidder.ToList(), "BidderId", "FullName");
+                return View(paddle);
+            }            
         }
 
         // GET: Paddles/Delete/5
@@ -129,6 +141,8 @@ namespace AuctionCoordinationTool.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.Bidder = await _context.Bidder.SingleOrDefaultAsync(o => o.BidderId == paddle.BidderId);
 
             return View(paddle);
         }

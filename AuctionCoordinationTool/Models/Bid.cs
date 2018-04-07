@@ -14,9 +14,11 @@ namespace AuctionCoordinationTool.Models
         public int BidId { get; set; }
 
         [ForeignKey("Paddle")]
+        [Display(Name ="Paddle #")]
         public int PaddleId { get; set; }
 
         [ForeignKey("Donation")]
+        [Display(Name = "Donation #")]
         public int DonationId { get; set; }
 
         [Display(Name = "Number of Units")]
