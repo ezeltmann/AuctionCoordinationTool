@@ -39,6 +39,28 @@ namespace AuctionCoordinationTool.Controllers
                 return NotFound();
             }
 
+            var paddles = await _context.Paddle.Where(o => o.BidderId == bidder.BidderId).ToListAsync();
+
+            if (paddles.Count > 0)
+            {
+                ViewBag.PaddleNumbers = paddles.Select(o => o.PaddleNumber.ToString()).Aggregate((tl, ni) => tl += ni + " ");
+
+                var paddleIds = paddles.Select(a => a.PaddleId).ToList();
+                var bids = await _context.Bid.Where(o => paddleIds.Contains(o.PaddleId)).ToListAsync();
+
+                ViewBag.Bids = bids;
+                ViewBag.TotalAmount = String.Format("{0:C}", bids.Select(o => o.TotalCost).Sum());
+                ViewBag.Donations = await _context.Donation.Where(o => bids.Select(a => a.DonationId).Contains(o.DonationID)).ToDictionaryAsync(e => e.DonationID);
+            }
+            else
+            {
+                ViewBag.PaddleNumbers = null;
+                ViewBag.Bids = new List<Bid>();
+                ViewBag.TotalAmount = "$0.00";
+                ViewBag.Donations = new Dictionary<int, Donation>();
+            }
+
+
             return View(bidder);
         }
 

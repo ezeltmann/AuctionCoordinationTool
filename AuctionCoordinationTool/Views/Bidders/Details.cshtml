@@ -83,6 +83,63 @@
             @Html.DisplayFor(model => model.EmailAddress)
         </dd>
     </dl>
+    <hr />
+    <h2>Current Bids -- Total: @ViewBag.TotalAmount</h2>
+    @{ var PaddleDisplay = new object(); }
+    @if (ViewBag.PaddleNumbers == null)
+    {
+        PaddleDisplay = Html.ActionLink("Assign A Paddle", "Create", "Paddles", new { id = Model.BidderId }, null);
+    }
+    else
+    {
+        PaddleDisplay = ViewBag.PaddleNumbers;
+    }
+    <h3>
+        Paddle Numbers: @PaddleDisplay
+    </h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayName("Donation Name")
+                </th>
+                <th>
+                    @Html.DisplayName("Units #")
+                </th>
+                <th>
+                    @Html.DisplayName("Cost Per Unit")
+                </th>
+                <th>
+                    @Html.DisplayName("Subtotal")
+                </th>
+                <th>
+                    @Html.DisplayName("Is Guest Pass?")
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.Bids)
+            {
+                <tr>
+                    <td>
+                        @ViewBag.Donations[item.DonationId].FullTitle
+                    </td>
+                    <td>
+                        @item.Units
+                    </td>
+                    <td>
+                        @item.CostPerUnit.ToString("C2")
+                    </td>
+                    <td>
+                        @item.TotalCost.ToString("C2")
+                    </td>
+                    <td>
+                        @item.IsGuestPass
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.BidderId">Edit</a> |
