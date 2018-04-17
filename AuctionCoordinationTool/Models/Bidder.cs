@@ -10,7 +10,7 @@ namespace AuctionCoordinationTool.Models
 {
     public class Bidder
     {
-        [Key]        
+        [Key]
         public int BidderId { get; set; }
 
         [Display(Name = "Member or Contributing Friend")]
@@ -48,6 +48,12 @@ namespace AuctionCoordinationTool.Models
 
         [Display(Name = "Email Address")]
         public string EmailAddress { get; set; }
+
+        [Display(Name = "Paid In Full")]
+        public bool PaidInFull { get; set; }
+
+        [Display(Name = "Amount Paid")]
+        public decimal AmountPaid {get; set;}
 
         [BindNever]
         public string FullName

@@ -118,6 +118,8 @@ namespace AuctionCoordinationTool.Controllers
             {
                 try
                 {
+                    bidder.PaidInFull = false;
+                    bidder.AmountPaid = 0;
                     _context.Update(bidder);
                     await _context.SaveChangesAsync();
                 }
@@ -170,5 +172,53 @@ namespace AuctionCoordinationTool.Controllers
         {
             return _context.Bidder.Any(e => e.BidderId == id);
         }
+
+        // GET: Bidders/CheckOut/5
+        public async Task<IActionResult> CheckOut(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var bidder = await _context.Bidder
+                .SingleOrDefaultAsync(m => m.BidderId == id);
+            if (bidder == null)
+            {
+                return NotFound();
+            }
+
+            var paddles = await _context.Paddle.Where(o => o.BidderId == bidder.BidderId).ToListAsync();
+
+            if (paddles.Count > 0)
+            {
+                var paddleIds = paddles.Select(a => a.PaddleId).ToList();
+                var bids = await _context.Bid.Where(o => paddleIds.Contains(o.PaddleId)).ToListAsync();
+
+                ViewBag.Bids = bids;
+                ViewBag.TotalAmount = String.Format("{0:C}", bids.Select(o => o.TotalCost).Sum());
+                ViewBag.Donations = await _context.Donation.Where(o => bids.Select(a => a.DonationId).Contains(o.DonationID)).ToDictionaryAsync(e => e.DonationID);
+            }
+            else
+            {
+                ViewBag.PaddleNumbers = null;
+                ViewBag.Bids = new List<Bid>();
+                ViewBag.TotalAmount = "$0.00";
+                ViewBag.Donations = new Dictionary<int, Donation>();
+            }
+
+            return View(bidder);
+        }
+
+        // POST: Bidders/CheckOut/5
+    //    [HttpPost, ActionName("CheckOut")]
+    //    [ValidateAntiForgeryToken]
+    //    public async Task<IActionResult> CheckOutConfirmed(int id, [Bind("TotalPaid,AmountOwed")] CheckOutResult result);
+    //    {
+    //        var bidder = await _context.Bidder.SingleOrDefaultAsync(m => m.BidderId == id);
+    //        _context.Bidder.Remove(bidder);
+    //        await _context.SaveChangesAsync();
+    //        return View(bidder);
+    //}
     }
 }
