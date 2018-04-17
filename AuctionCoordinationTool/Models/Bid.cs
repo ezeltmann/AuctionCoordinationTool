@@ -25,6 +25,7 @@ namespace AuctionCoordinationTool.Models
         public int Units { get; set; }
 
         [Display(Name = "Cost Per Unit")]
+        [DisplayFormat(DataFormatString = "{0:C}")]
         public decimal CostPerUnit { get; set; }
 
         [Display(Name = "Is Guest Pass?")]
@@ -32,6 +33,7 @@ namespace AuctionCoordinationTool.Models
 
         [BindNever]
         [Display(Name = "Total Cost")]
+        [DisplayFormat(DataFormatString = "{0:C}")]
         public decimal TotalCost
         {
             get

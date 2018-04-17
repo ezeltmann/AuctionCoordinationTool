@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -48,5 +49,14 @@ namespace AuctionCoordinationTool.Models
         [DataType(DataType.Date)]
         [Display(Name = "Rain Date")]
         public DateTime? RainDate { get; set; }
+
+        [BindNever]
+        public string FullTitle
+        {
+            get
+            {
+                return this.DonationID.ToString() + " - " + this.Title;
+            }
+        }
     }
 }

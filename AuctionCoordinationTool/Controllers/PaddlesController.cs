@@ -45,9 +45,16 @@ namespace AuctionCoordinationTool.Controllers
         }
 
         // GET: Paddles/Create
-        public IActionResult Create()
+        public IActionResult Create(int id = -1)
         {
-            ViewBag.Bidders = new SelectList(_context.Bidder.ToList(), "BidderId", "FullName");
+            if (id < 0)
+            {
+                ViewBag.Bidders = new SelectList(_context.Bidder.ToList(), "BidderId", "FullName");
+            }
+            else
+            {
+                ViewBag.Bidders = new SelectList(_context.Bidder.ToList(), "BidderId", "FullName", id);
+            }
             return View();
         }
 

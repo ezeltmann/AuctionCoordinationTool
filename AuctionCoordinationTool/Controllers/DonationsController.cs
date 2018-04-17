@@ -38,12 +38,16 @@ namespace AuctionCoordinationTool.Controllers
             var donation = await _context.Donation
                 .SingleOrDefaultAsync(m => m.DonationID == id);
 
+
             if (donation == null)
             {
                 return NotFound();
             }
             ViewBag.Donor = await _context.Donor.SingleOrDefaultAsync(o => o.DonorID == donation.DonorID);
-
+            var bids = await _context.Bid.Where(o => o.DonationId == donation.DonationID).ToListAsync();
+            ViewBag.Bids = bids;
+            ViewBag.TotalAmount = String.Format("{0:C}", bids.Select(o => o.TotalCost).Sum());
+            ViewBag.Paddles = await _context.Paddle.Where(o => bids.Select(a => a.PaddleId).Contains(o.PaddleId)).ToDictionaryAsync(o => o.PaddleId);
             return View(donation);
         }
 
@@ -130,6 +134,63 @@ namespace AuctionCoordinationTool.Controllers
                 return View(donation);
             }
         }
+
+        // GET: Donations/Edit/5
+        public async Task<IActionResult> EnterRunSheet(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var donation = await _context.Donation.SingleOrDefaultAsync(m => m.DonationID == id);
+            if (donation == null)
+            {
+                return NotFound();
+            }
+            ViewBag.Donors = new SelectList(_context.Donor.ToList(), "DonorID", "FullID");
+            return View(donation);
+        }
+
+        // POST: Donations/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EnterRunSheet(int id, [Bind("DonationID,DonorID,Title,Description,EstimatedValue,SuggestedStartingBid,UnitsOffered,PotentialTaxBreak,DateOfEvent,RainDate")] Donation donation)
+        {
+            if (id != donation.DonationID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(donation);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!DonationExists(donation.DonationID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                ViewBag.Donors = new SelectList(_context.Donor.ToList(), "DonorID", "FullID");
+                return View(donation);
+            }
+        }
+
 
         // GET: Donations/Delete/5
         public async Task<IActionResult> Delete(int? id)
