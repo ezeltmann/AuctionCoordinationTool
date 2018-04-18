@@ -1,0 +1,13 @@
+﻿@model AuctionCoordinationTool.Models.CheckOutError
+
+@{
+    ViewData["Title"] = "Check Out Error";
+}
+
+<div>
+    <h2>Check Out Error</h2>
+    <h2>Unable to check out bidder @Model.BidderId - @Model.BidderFullName</h2>
+    <h3>@Model.ErrorMessage</h3>
+    <a asp-action="Details" asp-route-id="@Model.BidderId">Return To Bidder Details</a>
+</div>
+

@@ -5,13 +5,17 @@ using System.Threading.Tasks;
 
 namespace AuctionCoordinationTool.Models
 {
-    public class CheckOutResult
+    public class CheckOut
     {
 
-        decimal TotalPaid { get; set; }
-        decimal AmountOwed { get; set; }
+        public int BidderId { get; set; }
 
-        bool PaidInFull
+        public decimal TotalPaid { get; set; }
+        public decimal AmountOwed { get; set; }
+
+        public string PaymentInfo { get; set; }
+
+        public bool PaidInFull
         {
             get
             {

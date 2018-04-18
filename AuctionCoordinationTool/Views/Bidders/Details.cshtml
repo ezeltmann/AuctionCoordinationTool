@@ -82,15 +82,10 @@
         <dd>
             @Html.DisplayFor(model => model.EmailAddress)
         </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.FullyPaid)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.FullyPaid)
-        </dd>
     </dl>
     <hr />
     <h2>Current Bids -- Total: @ViewBag.TotalAmount</h2>
+    <h2>Amount Paid: @Model.AmountPaid.ToString("C2")</h2>
     @{ var PaddleDisplay = new object(); }
     @if (ViewBag.PaddleNumbers == null)
     {
@@ -148,6 +143,7 @@
     </table>
 </div>
 <div>
+    <a asp-action="CheckOut" asp-route-id="@Model.BidderId">Check Out</a> | 
     <a asp-action="Edit" asp-route-id="@Model.BidderId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

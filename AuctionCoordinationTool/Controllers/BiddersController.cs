@@ -107,7 +107,7 @@ namespace AuctionCoordinationTool.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BidderId,MemberOrFriend,PrimaryFirstName,PrimaryLastName,SecondaryFirstName,SecondaryLastName,AddressLine1,AddressLine2,City,State,ZipCode,PhoneNumber,EmailAddress,FullyPaid")] Bidder bidder)
+        public async Task<IActionResult> Edit(int id, [Bind("BidderId,MemberOrFriend,PrimaryFirstName,PrimaryLastName,SecondaryFirstName,SecondaryLastName,AddressLine1,AddressLine2,City,State,ZipCode,PhoneNumber,EmailAddress,AmountPaid")] Bidder bidder)
         {
             if (id != bidder.BidderId)
             {
@@ -118,7 +118,6 @@ namespace AuctionCoordinationTool.Controllers
             {
                 try
                 {
-                    bidder.PaidInFull = false;
                     bidder.AmountPaid = 0;
                     _context.Update(bidder);
                     await _context.SaveChangesAsync();
@@ -176,13 +175,17 @@ namespace AuctionCoordinationTool.Controllers
         // GET: Bidders/CheckOut/5
         public async Task<IActionResult> CheckOut(int? id)
         {
+
+            //TODO -- Checkout Logic
             if (id == null)
             {
                 return NotFound();
             }
 
+            
             var bidder = await _context.Bidder
                 .SingleOrDefaultAsync(m => m.BidderId == id);
+
             if (bidder == null)
             {
                 return NotFound();
@@ -195,30 +198,97 @@ namespace AuctionCoordinationTool.Controllers
                 var paddleIds = paddles.Select(a => a.PaddleId).ToList();
                 var bids = await _context.Bid.Where(o => paddleIds.Contains(o.PaddleId)).ToListAsync();
 
+                var chkout = new CheckOut
+                {
+                    BidderId = bidder.BidderId,
+                    AmountOwed = bids.Select(o => o.TotalCost).Sum(),
+                    TotalPaid = bidder.AmountPaid,
+                    PaymentInfo = bidder.PaymentInfo
+                };
+
+                if (chkout.AmountOwed <= 0)
+                {
+                    var chkErr = new CheckOutError
+                    {
+                        BidderId = bidder.BidderId,
+                        BidderFullName = bidder.FullName,
+                        ErrorMessage = "Bidder does owe anything."
+                    };
+
+                    return View("CheckOutError", chkErr);
+                }
+
+
                 ViewBag.Bids = bids;
-                ViewBag.TotalAmount = String.Format("{0:C}", bids.Select(o => o.TotalCost).Sum());
+                ViewBag.TotalAmount = String.Format("{0:C}", chkout.AmountOwed);
                 ViewBag.Donations = await _context.Donation.Where(o => bids.Select(a => a.DonationId).Contains(o.DonationID)).ToDictionaryAsync(e => e.DonationID);
+
+                return View(chkout);
             }
             else
             {
-                ViewBag.PaddleNumbers = null;
-                ViewBag.Bids = new List<Bid>();
-                ViewBag.TotalAmount = "$0.00";
-                ViewBag.Donations = new Dictionary<int, Donation>();
+                var chkErr = new CheckOutError
+                {
+                    BidderId = bidder.BidderId,
+                    BidderFullName = bidder.FullName,
+                    ErrorMessage = "Bidder does not have any paddles, cannot bid or check-out."
+                };
+
+                return View("CheckOutError", chkErr);
             }
 
-            return View(bidder);
+            
         }
 
         // POST: Bidders/CheckOut/5
-    //    [HttpPost, ActionName("CheckOut")]
-    //    [ValidateAntiForgeryToken]
-    //    public async Task<IActionResult> CheckOutConfirmed(int id, [Bind("TotalPaid,AmountOwed")] CheckOutResult result);
-    //    {
-    //        var bidder = await _context.Bidder.SingleOrDefaultAsync(m => m.BidderId == id);
-    //        _context.Bidder.Remove(bidder);
-    //        await _context.SaveChangesAsync();
-    //        return View(bidder);
-    //}
+        [HttpPost, ActionName("CheckOut")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CheckOutConfirmed(int id, [Bind("BidderId,TotalPaid,AmountOwed,PaymentInfo")] CheckOut result)
+        {
+            //var bidder = await _context.Bidder.SingleOrDefaultAsync(m => m.BidderId == id);
+            //_context.Bidder.Remove(bidder);
+            //await _context.SaveChangesAsync();
+            //return View(result);
+
+
+            if (ModelState.IsValid)
+            {
+                var bidder = await _context.Bidder.SingleOrDefaultAsync(m => m.BidderId == id);
+
+                try
+                {
+                    bidder.AmountPaid = result.TotalPaid;
+                    bidder.PaymentInfo = result.PaymentInfo;
+                    _context.Update(bidder);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!BidderExists(bidder.BidderId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                var bidder = await _context.Bidder.SingleOrDefaultAsync(m => m.BidderId == id);
+
+                var chkErr = new CheckOutError
+                {
+                    BidderId = bidder.BidderId,
+                    BidderFullName = bidder.FullName,
+                    ErrorMessage = "Unknown Error, could not check out Bidder.  You shouldn't be seeing this."
+                };
+
+                return View("CheckOutError", chkErr);
+
+            }
+        }
     }
 }

@@ -49,11 +49,12 @@ namespace AuctionCoordinationTool.Models
         [Display(Name = "Email Address")]
         public string EmailAddress { get; set; }
 
-        [Display(Name = "Paid In Full")]
-        public bool PaidInFull { get; set; }
-
         [Display(Name = "Amount Paid")]
+        [DisplayFormat(DataFormatString = "{0:C}")]
         public decimal AmountPaid {get; set;}
+
+        [Display(Name = "Payment Info")]
+        public string PaymentInfo { get; set; }
 
         [BindNever]
         public string FullName
