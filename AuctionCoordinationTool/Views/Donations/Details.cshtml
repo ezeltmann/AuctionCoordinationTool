@@ -136,5 +136,5 @@
 <div>
     <a asp-action="Edit" asp-route-id="@Model.DonationID">Edit</a> |
     <a asp-action="Index">Back to List</a> |
-    <a asp-action="EnterRunSheet" asp-route-id="@Model.DonationID">Enter Bidding Sheet</a>
+    <a asp-action="EnterSheet" asp-controller="Bids" asp-route-id="@Model.DonationID">Enter Bidding Sheet</a>
 </div>

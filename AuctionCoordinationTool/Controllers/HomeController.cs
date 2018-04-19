@@ -132,7 +132,7 @@ namespace AuctionCoordinationTool.Controllers
             if (ModelState.IsValid)
             {
                 if (selectionModule.DonationId > 0)
-                    return RedirectToAction("EnterRunnerSheet", "Donations", new { id = selectionModule.DonationId });
+                    return RedirectToAction("EnterSheet", "Bids", new { id = selectionModule.DonationId });
             }
 
             return NotFound();

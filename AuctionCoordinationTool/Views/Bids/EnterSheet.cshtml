@@ -1,0 +1,112 @@
+﻿@model List<AuctionCoordinationTool.Models.Bid>
+
+@{ 
+    ViewBag.Title = "Enter Runner Sheet";
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#addNew").on("click", function (e) {
+            e.preventDefault();
+            var $tableBody = $("#dataTable");
+            var $trLast = $tableBody.find("tr:last");
+            var $trNew = $trLast.clone();
+
+            var suffix = $trNew.find(':input:first').attr('name').match(/\d+/);
+            $trNew.find("td:last").html('<a href="#" class="remove">Remove</a>');
+            $.each($trNew.find(':input'), function (i, val) {
+                var oldN = $(this).attr('name');
+                var newN = oldN.replace('[' + suffix + ']', '[' + (parseInt(suffix) + 1) + ']');
+                var len = (parseInt(suffix) + 1).toString().length + 3;
+                $(this).attr('name', newN);
+                var itemId = $(this).attr('id').toString().substring(len);
+                if (itemId.toLowerCase() == "costperunit") {
+                    $(this).attr('value', '');
+                }
+                if (itemId.toLowerCase() == "units") {
+                    $(this).attr('value', '');
+                }
+                if (itemId.toLowerCase() == "isguestpass") {
+                    $(this).prop("checked", false);
+                }
+                if (itemId.toLowerCase() == "donationid") {
+                    $(this).attr('value', '@ViewBag.DonationId');
+                }
+                if (itemId.toLowerCase() == "bidid") {
+                    $(this).attr('value', '0');
+                }
+                $(this).removeClass("input-validation-error");
+
+            });
+            $trLast.after($trNew);
+
+            var form = $("form")
+                .removeData("validator")
+                .removeData("unobtrusiveValidation");
+            $.validator.unobtrusive.parse(form);
+        });
+    });
+
+    $(document).on('click', 'a.remove', function (e) {
+        e.preventDefault();
+        $(this).parent().parent().remove();
+    });
+</script>
+
+<h2> Enter Runner Sheet </h2>
+<div>
+    @using (Html.BeginForm("EnterSheet", "Bids", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+        if (ViewBag.Message != null)
+        {
+            <div style="border:solid 1px green">
+                @ViewBag.Message
+            </div>
+        }
+
+        <div><a href="#" id="addNew">Add New</a></div>
+        <table class="table" id="dataTable">
+            <tr>
+                <th>
+                    Paddle Number
+                </th>
+                <th>
+                    Cost Per Unit
+                </th>
+                <th>
+                    Units
+                </th>
+                <th>
+                    Is Guest Pass?
+                </th>
+                <th></th>
+            </tr>
+            @if (Model != null && Model.Count > 0)
+            {
+                int j = 0;
+
+                foreach (var i in Model)
+                {
+                    <tr style="border:1px solid black;">
+                        <td>
+                            @Html.DropDownListFor(a => a[j].PaddleId, new SelectList(ViewBag.Paddles, "PaddleId", "PaddleNumber", ((List<Paddle>)ViewBag.Paddles).FirstOrDefault(b => b.PaddleId == i.PaddleId)), null, null)
+                        @Html.HiddenFor(a => a[j].DonationId, new { @class = "donation" })
+                        @Html.HiddenFor(a => a[j].BidId)
+                    </td>
+                    <td>@Html.TextBoxFor(a => a[j].CostPerUnit)</td>
+                    <td>@Html.TextBoxFor(a => a[j].Units)</td>
+                    <td>@Html.CheckBoxFor(a => a[j].IsGuestPass)</td>
+                    <td>
+                    </td>
+                </tr>
+                j++;
+            }
+
+        }
+        </table>
+        <input type="submit" value="Save Runner Data" />
+    }
+</div>

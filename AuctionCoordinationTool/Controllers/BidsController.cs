@@ -78,6 +78,79 @@ namespace AuctionCoordinationTool.Controllers
             
         }
 
+        public IActionResult EnterSheet(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var donation =  _context.Donation.SingleOrDefault(m => m.DonationID == id);
+            if (donation == null)
+            {
+                return NotFound();
+            }
+
+            List<Bid> bids = _context.Bid.Where(m => m.DonationId == id).ToList();
+            if (bids == null || bids.Count < 1) bids = new List<Bid>() { new Bid() { DonationId = id.Value } };
+
+            ViewBag.DonationId = id;
+            ViewBag.Paddles = _context.Paddle.ToList();
+
+            return View(bids);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EnterSheet(List<Bid> bids)
+        {
+            var id = bids[0]?.DonationId;
+
+            if (ModelState.IsValid)
+            {
+                                
+                foreach (Bid bid in bids)
+                {
+                    try
+                    {
+                        if (bid.BidId <= 0)
+                            _context.Add(bid);
+                        else _context.Update(bid);
+
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!BidExists(bid.BidId))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                }
+                ViewBag.Message = "Data Successfully Saved";
+                ModelState.Clear();
+
+                bids = _context.Bid.Where(m => m.DonationId == id.Value).ToList();
+                if (bids == null || bids.Count < 1) bids = new List<Bid>() { new Bid() { DonationId = id.Value } };
+
+            }
+
+            if (!id.HasValue) return NotFound();
+
+            ViewBag.DonationId = id.Value;
+            ViewBag.Paddles = _context.Paddle.ToList();
+
+            return View(bids);
+        }
+
+        public List<Paddle> GetPaddles()
+        {
+            return _context.Paddle.ToList();
+        }
+
         // GET: Bids/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
