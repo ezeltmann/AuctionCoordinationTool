@@ -19,7 +19,9 @@ namespace AuctionCoordinationTool.Controllers
 
         public IActionResult Index()
         {
-            
+            var GrandTotal = _context.Bid.Sum(m => m.TotalCost);
+
+            ViewBag.GrandTotal = GrandTotal;
             return View();
         }
 

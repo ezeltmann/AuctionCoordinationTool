@@ -96,10 +96,10 @@
                     @Html.DisplayName("Paddle #")
                 </th>
                 <th>
-                    @Html.DisplayName("Units #")
+                    @Html.DisplayName("Cost Per Unit")
                 </th>
                 <th>
-                    @Html.DisplayName("Cost Per Unit")
+                    @Html.DisplayName("Units #")
                 </th>
                 <th>
                     @Html.DisplayName("Subtotal")
@@ -117,10 +117,10 @@
                     @ViewBag.Paddles[item.PaddleId].PaddleNumber
                 </td>
                 <td>
-                    @item.Units
+                    @item.CostPerUnit.ToString("C2")
                 </td>
                 <td>
-                    @item.CostPerUnit.ToString("C2")
+                    @item.Units
                 </td>
                 <td>
                     @item.TotalCost.ToString("C2")

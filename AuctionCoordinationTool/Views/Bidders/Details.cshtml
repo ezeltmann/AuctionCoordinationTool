@@ -105,10 +105,10 @@
                     @Html.DisplayName("Donation Name")
                 </th>
                 <th>
-                    @Html.DisplayName("Units #")
+                    @Html.DisplayName("Cost Per Unit")
                 </th>
                 <th>
-                    @Html.DisplayName("Cost Per Unit")
+                    @Html.DisplayName("Units #")
                 </th>
                 <th>
                     @Html.DisplayName("Subtotal")
@@ -121,23 +121,23 @@
         <tbody>
             @foreach (var item in ViewBag.Bids)
             {
-                <tr>
-                    <td>
-                        @ViewBag.Donations[item.DonationId].FullTitle
-                    </td>
-                    <td>
-                        @item.Units
-                    </td>
-                    <td>
-                        @item.CostPerUnit.ToString("C2")
-                    </td>
-                    <td>
-                        @item.TotalCost.ToString("C2")
-                    </td>
-                    <td>
-                        @item.IsGuestPass
-                    </td>
-                </tr>
+            <tr>
+                <td>
+                    @ViewBag.Donations[item.DonationId].FullTitle
+                </td>
+                <td>
+                    @item.CostPerUnit.ToString("C2")
+                </td>
+                <td>
+                    @item.Units
+                </td>
+                <td>
+                    @item.TotalCost.ToString("C2")
+                </td>
+                <td>
+                    @item.IsGuestPass
+                </td>
+            </tr>
             }
         </tbody>
     </table>
