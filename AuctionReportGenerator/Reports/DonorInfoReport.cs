@@ -9,7 +9,7 @@ namespace AuctionReportGenerator.Reports
     {
         public void GenerateReport(AuctionDBContext context)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }
