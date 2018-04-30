@@ -25,6 +25,8 @@ namespace AuctionReportGenerator
                 report = new BidderReceiptReport();
                 report.GenerateReport(_context);
 
+                report = new DonationsTotalReport();
+                report.GenerateReport(_context);
             }
         }
     }

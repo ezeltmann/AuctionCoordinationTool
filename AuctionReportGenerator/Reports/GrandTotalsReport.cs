@@ -92,10 +92,10 @@ namespace AuctionReportGenerator.Reports
 
                     tw.WriteLine(String.Format(CSVFormat
                                 , paddle.PaddleNumber.ToString()
-                                , bidder.FullName
-                                , tmpTotal.ToString("C2")
-                                , bidder.AmountPaid.ToString("C2")
-                                , amtOutstanding.ToString("C2")));
+                                , bidder.FullName.Replace(",", " ", StringComparison.CurrentCulture)
+                                , tmpTotal
+                                , bidder.AmountPaid
+                                , amtOutstanding));
 
 
                 }

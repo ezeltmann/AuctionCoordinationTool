@@ -14,6 +14,12 @@ namespace AuctionReportGenerator.Reports
 {
     public class BidderReceiptReport : IAuctionReport
     {
+        public const string DISCLAIMER = "Thank You for participating and contributing to this year’s UUCY Auction." +
+                                         " This statement is your record of items that you won the bid for at the Auction. " +
+                                         "UUCY makes no claim regarding the tax status of your donations for this Auction. " +
+                                         "Please consult with your Tax Advisor as to whether any of your Auction donations are tax deductible. " +
+                                         "This will be your only statement from UUCY regarding the 2018 Auction.";
+
         public void GenerateReport(AuctionDBContext context)
         {
             var writer = new PdfWriter("BidderReceiptReport.pdf");
@@ -131,10 +137,18 @@ namespace AuctionReportGenerator.Reports
                 finalTotal.AddCell(new Cell().Add(new Paragraph(bidder.AmountPaid.ToString("C2")).SetFont(font).SetPadding(1)));
                 finalTotal.AddCell(new Cell().Add(new Paragraph(amtOutstanding.ToString("C2")).SetFont(font).SetPadding(1)));
 
+                
+
+                var statement = new Paragraph().SetFontSize(12)
+                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.JUSTIFIED)
+                    .SetHorizontalAlignment(iText.Layout.Properties.HorizontalAlignment.CENTER)
+                    .Add(new Text(DISCLAIMER));
+
                 document.Add(header);
                 document.Add(table);
                 document.Add(breaker);
                 document.Add(finalTotal);
+                document.Add(statement);
 
                 count++;
             }
