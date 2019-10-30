@@ -24,21 +24,11 @@ namespace AuctionCoordinationTool.Models
         [Display(Name = "Child Count")]
         public int ChildCount { get; set; }
 
-        [Display(Name = "Amount Due")]
-        [DisplayFormat(DataFormatString = "{0:C}")]
-        public decimal AmountDue { get; set; }
+        [Display(Name = "Adult Count at Door")]
+        public int AdultCountDoor { get; set; }
 
-        [Display(Name = "Amount Paid")]
-        [DisplayFormat(DataFormatString = "{0:C}")]
-        public decimal AmountPaid {get; set;}
+        [Display(Name = "Child Count at Door")]
+        public int ChildCountDoor { get; set; }
 
-        [BindNever]
-        public bool IsPaid
-        {
-            get
-            {
-                return (this.AmountPaid >= this.AmountDue);
-            }
-        }
     }
 }
