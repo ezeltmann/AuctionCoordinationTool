@@ -18,17 +18,12 @@ namespace AuctionCoordinationTool.Models
         [Display(Name = "Bidder")]
         public int BidderId { get; set; }
 
-        [Display(Name = "Adult Count")]
-        public int AdultCount { get; set; }
+        [ForeignKey("AuctionTickets")]
+        [Display(Name = "Ticket Type")]
+        public int TicketTypeId { get; set; }
 
-        [Display(Name = "Child Count")]
-        public int ChildCount { get; set; }
-
-        [Display(Name = "Adult Count at Door")]
-        public int AdultCountDoor { get; set; }
-
-        [Display(Name = "Child Count at Door")]
-        public int ChildCountDoor { get; set; }
+        [Display(Name = "Count")]
+        public int Count { get; set; }
 
     }
 }

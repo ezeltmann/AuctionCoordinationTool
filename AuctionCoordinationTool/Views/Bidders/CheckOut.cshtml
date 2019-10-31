@@ -57,37 +57,34 @@
             <thead>
                 <tr>
                     <th>
-                        @Html.DisplayName("Adult tickets")
+                        @Html.DisplayName("Ticket Type")
                     </th>
                     <th>
-                        @Html.DisplayName("Adult tickets at the Door")
+                        @Html.DisplayName("Quantity")
                     </th>
                     <th>
-                        @Html.DisplayName("Children tickets")
+                        @Html.DisplayName("Cost Per Unit")
                     </th>
                     <th>
-                        @Html.DisplayName("Children tickets at the Door")
+                        @Html.DisplayName("Subtotal")
                     </th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in ViewBag.Bids)
+                @foreach (var item in ViewBag.TicketLineItems)
                 {
                     <tr>
                         <td>
-                            @ViewBag.Donations[item.DonationId].FullTitle
+                            @item.Description
                         </td>
                         <td>
-                            @item.Units
+                            @item.Quantity
                         </td>
                         <td>
                             @item.CostPerUnit.ToString("C2")
                         </td>
                         <td>
-                            @item.TotalCost.ToString("C2")
-                        </td>
-                        <td>
-                            @item.IsGuestPass
+                            @item.SubTotal.ToString("C2")
                         </td>
                     </tr>
                 }
