@@ -19,5 +19,7 @@ namespace AuctionCoordinationTool.Models
         public DbSet<AuctionCoordinationTool.Models.Bidder> Bidder { get; set; }
         public DbSet<AuctionCoordinationTool.Models.Paddle> Paddle { get; set; }
         public DbSet<AuctionCoordinationTool.Models.Bid> Bid { get; set; }
+        public DbSet<AuctionCoordinationTool.Models.AuctionParameters> AuctionParameters { get; set; }
+        public DbSet<AuctionCoordinationTool.Models.Ticket> Tickets { get; set; }
     }
 }

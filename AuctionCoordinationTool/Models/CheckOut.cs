@@ -13,13 +13,15 @@ namespace AuctionCoordinationTool.Models
         public decimal TotalPaid { get; set; }
         public decimal AmountOwed { get; set; }
 
+        public decimal TicketOwed { get; set; }
+
         public string PaymentInfo { get; set; }
 
         public bool PaidInFull
         {
             get
             {
-                return (TotalPaid >= AmountOwed);
+                return (TotalPaid >= (AmountOwed + TicketOwed));
             }
         }
     }
