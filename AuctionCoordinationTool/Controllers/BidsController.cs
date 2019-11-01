@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AuctionCoordinationTool.Models;
+using log4net.Core;
 
 namespace AuctionCoordinationTool.Controllers
 {
     public class BidsController : Controller
     {
         private readonly AuctionDBContext _context;
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(typeof(BidsController));
 
         public BidsController(AuctionDBContext context)
         {
@@ -80,6 +82,7 @@ namespace AuctionCoordinationTool.Controllers
 
         public IActionResult EnterSheet(int? id)
         {
+            log.Debug("Entered the EnterSheet method with an id of " + id.ToString());
             if (id == null)
             {
                 return NotFound();
@@ -96,17 +99,19 @@ namespace AuctionCoordinationTool.Controllers
 
             ViewBag.DonationId = id;
             ViewBag.Paddles = _context.Paddle.ToList();
-
+            log.Debug("Left the EnterSheet method");
             return View(bids);
         }
 
         [HttpPost]
         public async Task<IActionResult> EnterSheet(List<Bid> bids)
         {
+            log.Debug("Entered the Post EnterSheet method");
             var id = bids[0]?.DonationId;
 
             if (ModelState.IsValid)
             {
+                log.Debug("Model State is Valid.");
                                 
                 foreach (Bid bid in bids)
                 {
@@ -118,16 +123,23 @@ namespace AuctionCoordinationTool.Controllers
 
                         await _context.SaveChangesAsync();
                     }
-                    catch (DbUpdateConcurrencyException)
+                    catch (DbUpdateConcurrencyException dbe)
                     {
+                        log.Error("Caught Concurrency Exception, Donation id: " + id.ToString(), dbe);
+                        
                         if (!BidExists(bid.BidId))
                         {
+                            log.Error("Bid Does Not Exist");
                             return NotFound();
                         }
                         else
                         {
                             throw;
                         }
+                    }
+                    catch (Exception e)
+                    {
+                        log.Error("Caught Exception, Donation id: " + id.ToString(), e);
                     }
                 }
                 ViewBag.Message = "Data Successfully Saved";
