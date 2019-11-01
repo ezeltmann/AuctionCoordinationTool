@@ -15,13 +15,11 @@
             <input type="hidden" asp-for="TicketId" />
             <div class="form-group">
                 <label asp-for="BidderId" class="control-label"></label>
-                <input asp-for="BidderId" class="form-control" />
-                <span asp-validation-for="BidderId" class="text-danger"></span>
+                <select asp-for="@Model.BidderId" asp-items="@ViewBag.Bidders"></select>
             </div>
             <div class="form-group">
                 <label asp-for="TicketTypeId" class="control-label"></label>
-                <input asp-for="TicketTypeId" class="form-control" />
-                <span asp-validation-for="TicketTypeId" class="text-danger"></span>
+                <select asp-for="@Model.TicketTypeId" asp-items="@ViewBag.AuctionTickets"></select>
             </div>
             <div class="form-group">
                 <label asp-for="Count" class="control-label"></label>

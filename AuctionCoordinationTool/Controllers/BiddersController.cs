@@ -42,26 +42,38 @@ namespace AuctionCoordinationTool.Controllers
             }
 
             var paddles = await _context.Paddle.Where(o => o.BidderId == bidder.BidderId).ToListAsync();
+            var tickets = await _context.Ticket.Where(o => o.BidderId == bidder.BidderId).ToListAsync();
+
+            var bids = new List<Bid>();
+            var donations = new Dictionary<int, Donation>();
+            decimal bidTotal = 0.0m;
+            decimal ticketTotal = 0.0m;
+            string paddleNumbers = string.Empty;
 
             if (paddles.Count > 0)
-            {
-                ViewBag.PaddleNumbers = paddles.Select(o => o.PaddleNumber.ToString()).Aggregate((tl, ni) => tl += ni + " ");
-
+            {                
                 var paddleIds = paddles.Select(a => a.PaddleId).ToList();
-                var bids = await _context.Bid.Where(o => paddleIds.Contains(o.PaddleId)).ToListAsync();
-
-                ViewBag.Bids = bids;
-                ViewBag.TotalAmount = String.Format("{0:C}", bids.Select(o => o.TotalCost).Sum());
-                ViewBag.Donations = await _context.Donation.Where(o => bids.Select(a => a.DonationId).Contains(o.DonationID)).ToDictionaryAsync(e => e.DonationID);
+                bids = await _context.Bid.Where(o => paddleIds.Contains(o.PaddleId)).ToListAsync();
+                donations = await _context.Donation.Where(o => bids.Select(a => a.DonationId).Contains(o.DonationID)).ToDictionaryAsync(e => e.DonationID);
+                bidTotal += bids.Select(o => o.TotalCost).Sum();
+                paddleNumbers = paddles.Select(o => o.PaddleNumber.ToString()).Aggregate((tl, ni) => tl += ni + " ");
             }
-            else
+
+            List<TicketLineItem> ticketLineItems = new List<TicketLineItem>();
+
+            if (BidderHadTickets(tickets))  //Check for tickets
             {
-                ViewBag.PaddleNumbers = null;
-                ViewBag.Bids = new List<Bid>();
-                ViewBag.TotalAmount = "$0.00";
-                ViewBag.Donations = new Dictionary<int, Donation>();
+                ticketLineItems = GenerateTicketLineItems(tickets);
+                ticketTotal += CalculateTicketOwed(ticketLineItems);
             }
 
+            ViewBag.PaddleNumbers = paddleNumbers;
+            ViewBag.Bids = bids;
+            ViewBag.TotalAmount = String.Format("{0:C}", ticketTotal + bidTotal);
+            ViewBag.Donations = donations;
+            ViewBag.TicketLineItems = ticketLineItems;
+            ViewBag.TicketOwed = String.Format("{0:C}", ticketTotal);
+            ViewBag.BidOwed = String.Format("{0:C}", bidTotal);
 
             return View(bidder);
         }
@@ -194,7 +206,7 @@ namespace AuctionCoordinationTool.Controllers
             }
             
             var paddles = await _context.Paddle.Where(o => o.BidderId == bidder.BidderId).ToListAsync();
-            var tickets = await _context.Tickets.Where(o => o.BidderId == bidder.BidderId).ToListAsync();
+            var tickets = await _context.Ticket.Where(o => o.BidderId == bidder.BidderId).ToListAsync();
             var chkout = CreateCheckOutItem(bidder);
 
             if (!BidderParticipated(paddles, tickets))
@@ -204,21 +216,23 @@ namespace AuctionCoordinationTool.Controllers
                 return View("CheckOutError", GenerateCheckOutError(bidder, "Bidder does not have any paddles or tickets, cannot bid or check-out."));
             }
 
-            List<Bid> bids = null;
+            List<Bid> bids = new List<Bid>();
             if (BidderHadAPaddle(paddles)) //Check for Paddles a paddle
             {
                 var paddleIds = paddles.Select(a => a.PaddleId).ToList();
                 bids = await _context.Bid.Where(o => paddleIds.Contains(o.PaddleId)).ToListAsync();
-                chkout.AmountOwed = CalculateBidOwed(bids);                                    
+                chkout.BidOwed = CalculateBidOwed(bids);                                    
             }
 
-            List<TicketLineItem> ticketLineItems = null;
+            List<TicketLineItem> ticketLineItems = new List<TicketLineItem>();
 
             if (BidderHadTickets(tickets))  //Check for tickets
             {
                 ticketLineItems = GenerateTicketLineItems(tickets);
                 chkout.TicketOwed = CalculateTicketOwed(ticketLineItems);
             }
+
+            chkout.AmountOwed = chkout.BidOwed + chkout.TicketOwed;
 
             if (chkout.PaidInFull)
             {
@@ -228,9 +242,9 @@ namespace AuctionCoordinationTool.Controllers
             ViewBag.TotalAmount = String.Format("{0:C}", chkout.TicketOwed);
             ViewBag.TicketLineItems = ticketLineItems;
             ViewBag.Bids = bids;
-            ViewBag.BidOwed = String.Format("{0:C}", chkout.AmountOwed);
+            ViewBag.BidOwed = String.Format("{0:C}", chkout.BidOwed);
             ViewBag.TicketOwed = String.Format("{0:C}", chkout.TicketOwed);
-            ViewBag.TotalAmount = String.Format("{0:C}", chkout.AmountOwed + chkout.TicketOwed);
+            ViewBag.TotalAmount = String.Format("{0:C}", chkout.AmountOwed);
             ViewBag.Donations = await _context.Donation.Where(o => bids.Select(a => a.DonationId).Contains(o.DonationID)).ToDictionaryAsync(e => e.DonationID);
 
             return View(chkout);

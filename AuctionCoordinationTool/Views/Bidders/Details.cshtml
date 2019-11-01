@@ -84,7 +84,9 @@
         </dd>
     </dl>
     <hr />
-    <h2>Current Bids -- Total: @ViewBag.TotalAmount</h2>
+    <h2>Current Bids -- Total: @ViewBag.BidOwed</h2>
+    <h2>Current Tickets -- Total: @ViewBag.TicketOwed</h2>
+    <h2>Current Total -- Total: @ViewBag.TotalAmount</h2>
     <h2>Amount Paid: @Model.AmountPaid.ToString("C2")</h2>
     @{ var PaddleDisplay = new object(); }
     @if (ViewBag.PaddleNumbers == null)
@@ -121,26 +123,64 @@
         <tbody>
             @foreach (var item in ViewBag.Bids)
             {
-            <tr>
-                <td>
-                    @ViewBag.Donations[item.DonationId].FullTitle
-                </td>
-                <td>
-                    @item.CostPerUnit.ToString("C2")
-                </td>
-                <td>
-                    @item.Units
-                </td>
-                <td>
-                    @item.TotalCost.ToString("C2")
-                </td>
-                <td>
-                    @item.IsGuestPass
-                </td>
-            </tr>
+                <tr>
+                    <td>
+                        @ViewBag.Donations[item.DonationId].FullTitle
+                    </td>
+                    <td>
+                        @item.CostPerUnit.ToString("C2")
+                    </td>
+                    <td>
+                        @item.Units
+                    </td>
+                    <td>
+                        @item.TotalCost.ToString("C2")
+                    </td>
+                    <td>
+                        @item.IsGuestPass
+                    </td>
+                </tr>
             }
         </tbody>
     </table>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayName("Ticket Type")
+                </th>
+                <th>
+                    @Html.DisplayName("Quantity")
+                </th>
+                <th>
+                    @Html.DisplayName("Cost Per Unit")
+                </th>
+                <th>
+                    @Html.DisplayName("Subtotal")
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.TicketLineItems)
+            {
+                <tr>
+                    <td>
+                        @item.Description
+                    </td>
+                    <td>
+                        @item.Quantity
+                    </td>
+                    <td>
+                        @item.CostPerUnit.ToString("C2")
+                    </td>
+                    <td>
+                        @item.Subtotal.ToString("C2")
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
 </div>
 <div>
     <a asp-action="CheckOut" asp-route-id="@Model.BidderId">Check Out</a> | 

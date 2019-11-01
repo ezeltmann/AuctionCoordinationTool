@@ -19,10 +19,26 @@ namespace AuctionCoordinationTool.Controllers
 
         public IActionResult Index()
         {
-            var GrandTotal = _context.Bid.Sum(m => m.TotalCost);
+            var bidTotal = _context.Bid.Sum(m => m.TotalCost);
+            decimal ticketTotal = CalculateTicketTotal();
 
-            ViewBag.GrandTotal = GrandTotal;
+            ViewBag.BidTotal = bidTotal;
+            ViewBag.TicketTotal = ticketTotal;
+            ViewBag.GrandTotal = bidTotal + ticketTotal;
             return View();
+        }
+
+        private decimal CalculateTicketTotal()
+        {
+            var auctionTickets = _context.AuctionTickets.ToList();
+            decimal result = 0.0m;
+            foreach (AuctionTickets item in auctionTickets)
+            {
+                int count = _context.Ticket.Where(o => o.TicketTypeId == item.TicketTypeId).Sum(o => o.Count);
+                result += count * item.CostPerUnit;
+            }
+
+            return result;
         }
 
         public IActionResult About()

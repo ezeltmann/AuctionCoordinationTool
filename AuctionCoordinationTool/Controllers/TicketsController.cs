@@ -21,7 +21,9 @@ namespace AuctionCoordinationTool.Controllers
         // GET: Tickets
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Tickets.ToListAsync());
+            ViewBag.Bidders = _context.Bidder.ToList().ToDictionary(o => o.BidderId);
+            ViewBag.AuctionTickets = _context.AuctionTickets.ToList().ToDictionary(o => o.TicketTypeId);
+            return View(await _context.Ticket.ToListAsync());
         }
 
         // GET: Tickets/Details/5
@@ -32,19 +34,23 @@ namespace AuctionCoordinationTool.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets
+            var ticket = await _context.Ticket
                 .FirstOrDefaultAsync(m => m.TicketId == id);
             if (ticket == null)
             {
                 return NotFound();
             }
 
+            ViewBag.BidderName = _context.Bidder.Where(o => o.BidderId == ticket.BidderId).Single().FullName;
+            ViewBag.TicketType = _context.AuctionTickets.Where(o => o.TicketTypeId == ticket.TicketTypeId).Single().Description;
             return View(ticket);
         }
 
         // GET: Tickets/Create
         public IActionResult Create()
         {
+            ViewBag.Bidders = new SelectList(_context.Bidder.ToList(), "BidderId", "FullName");
+            ViewBag.AuctionTickets = new SelectList(_context.AuctionTickets.ToList(), "TicketTypeId", "Description");
             return View();
         }
 
@@ -61,7 +67,12 @@ namespace AuctionCoordinationTool.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(ticket);
+            else
+            {
+                ViewBag.Bidders = new SelectList(_context.Bidder.ToList(), "BidderId", "FullName");
+                ViewBag.AuctionTickets = new SelectList(_context.AuctionTickets.ToList(), "TicketTypeId", "Description");
+                return View(ticket);
+            }
         }
 
         // GET: Tickets/Edit/5
@@ -72,11 +83,14 @@ namespace AuctionCoordinationTool.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets.FindAsync(id);
+            var ticket = await _context.Ticket.FindAsync(id);
             if (ticket == null)
             {
                 return NotFound();
             }
+
+            ViewBag.Bidders = new SelectList(_context.Bidder.ToList(), "BidderId", "FullName");
+            ViewBag.AuctionTickets = new SelectList(_context.AuctionTickets.ToList(), "TicketTypeId", "Description");
             return View(ticket);
         }
 
@@ -123,13 +137,15 @@ namespace AuctionCoordinationTool.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets
+            var ticket = await _context.Ticket
                 .FirstOrDefaultAsync(m => m.TicketId == id);
             if (ticket == null)
             {
                 return NotFound();
             }
 
+            ViewBag.BidderName = _context.Bidder.Where(o => o.BidderId == ticket.BidderId).Single().FullName;
+            ViewBag.TicketType = _context.AuctionTickets.Where(o => o.TicketTypeId == ticket.TicketTypeId).Single().Description;
             return View(ticket);
         }
 
@@ -138,15 +154,15 @@ namespace AuctionCoordinationTool.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var ticket = await _context.Tickets.FindAsync(id);
-            _context.Tickets.Remove(ticket);
+            var ticket = await _context.Ticket.FindAsync(id);
+            _context.Ticket.Remove(ticket);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool TicketExists(int id)
         {
-            return _context.Tickets.Any(e => e.TicketId == id);
+            return _context.Ticket.Any(e => e.TicketId == id);
         }
     }
 }
