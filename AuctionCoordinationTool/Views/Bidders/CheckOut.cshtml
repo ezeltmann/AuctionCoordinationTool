@@ -4,78 +4,116 @@
     ViewData["Title"] = "Check Out Bidder";
 }
 
-<div>
-    <h2>Check Out Bidder: @ViewBag.BidderFullName</h2>
-    <h2>Current Bids -- Total: @Model.AmountOwed</h2>
-    <h3>
-        Paddle Numbers: @ViewBag.PaddleNumbers
-    </h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayName("Donation Name")
-                </th>
-                <th>
-                    @Html.DisplayName("Units #")
-                </th>
-                <th>
-                    @Html.DisplayName("Cost Per Unit")
-                </th>
-                <th>
-                    @Html.DisplayName("Subtotal")
-                </th>
-                <th>
-                    @Html.DisplayName("Is Guest Pass?")
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in ViewBag.Bids)
-            {
+    <div>
+        <h2>Check Out Bidder: @ViewBag.BidderFullName</h2>
+        <h2>Current Bids -- Total: @Model.AmountOwed</h2>
+        <h3>
+            Paddle Numbers: @ViewBag.PaddleNumbers
+        </h3>
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>
-                        @ViewBag.Donations[item.DonationId].FullTitle
-                    </td>
-                    <td>
-                        @item.Units
-                    </td>
-                    <td>
-                        @item.CostPerUnit.ToString("C2")
-                    </td>
-                    <td>
-                        @item.TotalCost.ToString("C2")
-                    </td>
-                    <td>
-                        @item.IsGuestPass
-                    </td>
+                    <th>
+                        @Html.DisplayName("Donation Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Units #")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Cost Per Unit")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Subtotal")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Is Guest Pass?")
+                    </th>
                 </tr>
-            }
-        </tbody>
-    </table>
-    <form asp-action="CheckOut">
+            </thead>
+            <tbody>
+                @foreach (var item in ViewBag.Bids)
+                {
+                    <tr>
+                        <td>
+                            @ViewBag.Donations[item.DonationId].FullTitle
+                        </td>
+                        <td>
+                            @item.Units
+                        </td>
+                        <td>
+                            @item.CostPerUnit.ToString("C2")
+                        </td>
+                        <td>
+                            @item.TotalCost.ToString("C2")
+                        </td>
+                        <td>
+                            @item.IsGuestPass
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayName("Ticket Type")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Quantity")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Cost Per Unit")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Subtotal")
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ViewBag.TicketLineItems)
+                {
+                    <tr>
+                        <td>
+                            @item.Description
+                        </td>
+                        <td>
+                            @item.Quantity
+                        </td>
+                        <td>
+                            @item.CostPerUnit.ToString("C2")
+                        </td>
+                        <td>
+                            @item.Subtotal.ToString("C2")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
 
-        <div class="form-group">
-            <label asp-for="AmountOwed" class="control-label"></label>
-            <input asp-for="AmountOwed" readonly="readonly" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label asp-for="TotalPaid" class="control-label"></label>
-            <input asp-for="TotalPaid" class="form-control" />
-            <span asp-validation-for="TotalPaid" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="PaymentInfo" class="control-label"></label>
-            <input asp-for="PaymentInfo" class="form-control" />
-            <span asp-validation-for="PaymentInfo" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <input asp-for="BidderId" type="hidden" />
-            <input type="submit" value="Check-Out" class="btn btn-default" />
-        </div>
-    </form>
-    <a asp-action="Details" asp-route-id="@Model.BidderId">Back To Bidder Details</a><br />
-    <a asp-action="Index">Back to List</a>
-</div>
+        <form asp-action="CheckOut">
+
+            <div class="form-group">
+                <label asp-for="AmountOwed" class="control-label"></label>
+                <input asp-for="AmountOwed" readonly="readonly" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="TotalPaid" class="control-label"></label>
+                <input asp-for="TotalPaid" class="form-control" />
+                <span asp-validation-for="TotalPaid" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PaymentInfo" class="control-label"></label>
+                <input asp-for="PaymentInfo" class="form-control" />
+                <span asp-validation-for="PaymentInfo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="BidderId" type="hidden" />
+                <input type="submit" value="Check-Out" class="btn btn-default" />
+            </div>
+        </form>
+        <a asp-action="Details" asp-route-id="@Model.BidderId">Back To Bidder Details</a><br />
+        <a asp-action="Index">Back to List</a>
+    </div>
 
 

@@ -13,6 +13,9 @@ namespace AuctionCoordinationTool.Models
         public decimal TotalPaid { get; set; }
         public decimal AmountOwed { get; set; }
 
+        public decimal BidOwed { get; set; }
+        public decimal TicketOwed { get; set; }
+
         public string PaymentInfo { get; set; }
 
         public bool PaidInFull

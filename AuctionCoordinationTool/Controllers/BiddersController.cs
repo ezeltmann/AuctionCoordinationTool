@@ -12,10 +12,12 @@ namespace AuctionCoordinationTool.Controllers
     public class BiddersController : Controller
     {
         private readonly AuctionDBContext _context;
-
+        private readonly List<AuctionTickets> _tickets;
+       
         public BiddersController(AuctionDBContext context)
         {
             _context = context;
+            _tickets = _context.AuctionTickets.ToList();
         }
 
         // GET: Bidders
@@ -40,26 +42,38 @@ namespace AuctionCoordinationTool.Controllers
             }
 
             var paddles = await _context.Paddle.Where(o => o.BidderId == bidder.BidderId).ToListAsync();
+            var tickets = await _context.Ticket.Where(o => o.BidderId == bidder.BidderId).ToListAsync();
+
+            var bids = new List<Bid>();
+            var donations = new Dictionary<int, Donation>();
+            decimal bidTotal = 0.0m;
+            decimal ticketTotal = 0.0m;
+            string paddleNumbers = string.Empty;
 
             if (paddles.Count > 0)
-            {
-                ViewBag.PaddleNumbers = paddles.Select(o => o.PaddleNumber.ToString()).Aggregate((tl, ni) => tl += ni + " ");
-
+            {                
                 var paddleIds = paddles.Select(a => a.PaddleId).ToList();
-                var bids = await _context.Bid.Where(o => paddleIds.Contains(o.PaddleId)).ToListAsync();
-
-                ViewBag.Bids = bids;
-                ViewBag.TotalAmount = String.Format("{0:C}", bids.Select(o => o.TotalCost).Sum());
-                ViewBag.Donations = await _context.Donation.Where(o => bids.Select(a => a.DonationId).Contains(o.DonationID)).ToDictionaryAsync(e => e.DonationID);
+                bids = await _context.Bid.Where(o => paddleIds.Contains(o.PaddleId)).ToListAsync();
+                donations = await _context.Donation.Where(o => bids.Select(a => a.DonationId).Contains(o.DonationID)).ToDictionaryAsync(e => e.DonationID);
+                bidTotal += bids.Select(o => o.TotalCost).Sum();
+                paddleNumbers = paddles.Select(o => o.PaddleNumber.ToString()).Aggregate((tl, ni) => tl += ni + " ");
             }
-            else
+
+            List<TicketLineItem> ticketLineItems = new List<TicketLineItem>();
+
+            if (BidderHadTickets(tickets))  //Check for tickets
             {
-                ViewBag.PaddleNumbers = null;
-                ViewBag.Bids = new List<Bid>();
-                ViewBag.TotalAmount = "$0.00";
-                ViewBag.Donations = new Dictionary<int, Donation>();
+                ticketLineItems = GenerateTicketLineItems(tickets);
+                ticketTotal += CalculateTicketOwed(ticketLineItems);
             }
 
+            ViewBag.PaddleNumbers = paddleNumbers;
+            ViewBag.Bids = bids;
+            ViewBag.TotalAmount = String.Format("{0:C}", ticketTotal + bidTotal);
+            ViewBag.Donations = donations;
+            ViewBag.TicketLineItems = ticketLineItems;
+            ViewBag.TicketOwed = String.Format("{0:C}", ticketTotal);
+            ViewBag.BidOwed = String.Format("{0:C}", bidTotal);
 
             return View(bidder);
         }
@@ -190,55 +204,129 @@ namespace AuctionCoordinationTool.Controllers
             {
                 return NotFound();
             }
-
+            
             var paddles = await _context.Paddle.Where(o => o.BidderId == bidder.BidderId).ToListAsync();
+            var tickets = await _context.Ticket.Where(o => o.BidderId == bidder.BidderId).ToListAsync();
+            var chkout = CreateCheckOutItem(bidder);
 
-            if (paddles.Count > 0)
+            if (!BidderParticipated(paddles, tickets))
+            {
+
+
+                return View("CheckOutError", GenerateCheckOutError(bidder, "Bidder does not have any paddles or tickets, cannot bid or check-out."));
+            }
+
+            List<Bid> bids = new List<Bid>();
+            if (BidderHadAPaddle(paddles)) //Check for Paddles a paddle
             {
                 var paddleIds = paddles.Select(a => a.PaddleId).ToList();
-                var bids = await _context.Bid.Where(o => paddleIds.Contains(o.PaddleId)).ToListAsync();
-
-                var chkout = new CheckOut
-                {
-                    BidderId = bidder.BidderId,
-                    AmountOwed = bids.Select(o => o.TotalCost).Sum(),
-                    TotalPaid = bidder.AmountPaid,
-                    PaymentInfo = bidder.PaymentInfo
-                };
-
-                if (chkout.AmountOwed <= 0)
-                {
-                    var chkErr = new CheckOutError
-                    {
-                        BidderId = bidder.BidderId,
-                        BidderFullName = bidder.FullName,
-                        ErrorMessage = "Bidder does owe anything."
-                    };
-
-                    return View("CheckOutError", chkErr);
-                }
-
-
-                ViewBag.Bids = bids;
-                ViewBag.TotalAmount = String.Format("{0:C}", chkout.AmountOwed);
-                ViewBag.Donations = await _context.Donation.Where(o => bids.Select(a => a.DonationId).Contains(o.DonationID)).ToDictionaryAsync(e => e.DonationID);
-
-                return View(chkout);
+                bids = await _context.Bid.Where(o => paddleIds.Contains(o.PaddleId)).ToListAsync();
+                chkout.BidOwed = CalculateBidOwed(bids);                                    
             }
-            else
+
+            List<TicketLineItem> ticketLineItems = new List<TicketLineItem>();
+
+            if (BidderHadTickets(tickets))  //Check for tickets
             {
-                var chkErr = new CheckOutError
-                {
-                    BidderId = bidder.BidderId,
-                    BidderFullName = bidder.FullName,
-                    ErrorMessage = "Bidder does not have any paddles, cannot bid or check-out."
-                };
-
-                return View("CheckOutError", chkErr);
+                ticketLineItems = GenerateTicketLineItems(tickets);
+                chkout.TicketOwed = CalculateTicketOwed(ticketLineItems);
             }
 
-            
+            chkout.AmountOwed = chkout.BidOwed + chkout.TicketOwed;
+
+            if (chkout.PaidInFull)
+            {
+                return View("CheckOutError", GenerateCheckOutError(bidder, "Bidder does owe anything."));
+            }
+           
+            ViewBag.TotalAmount = String.Format("{0:C}", chkout.TicketOwed);
+            ViewBag.TicketLineItems = ticketLineItems;
+            ViewBag.Bids = bids;
+            ViewBag.BidOwed = String.Format("{0:C}", chkout.BidOwed);
+            ViewBag.TicketOwed = String.Format("{0:C}", chkout.TicketOwed);
+            ViewBag.TotalAmount = String.Format("{0:C}", chkout.AmountOwed);
+            ViewBag.Donations = await _context.Donation.Where(o => bids.Select(a => a.DonationId).Contains(o.DonationID)).ToDictionaryAsync(e => e.DonationID);
+
+            return View(chkout);
+
+
         }
+
+        private List<TicketLineItem> GenerateTicketLineItems(List<Ticket> tickets)
+        {
+            List<TicketLineItem> result = new List<TicketLineItem>();
+
+            foreach(Ticket ticket in tickets)
+            {
+                TicketLineItem item = new TicketLineItem();
+                AuctionTickets auctionTicket = _tickets.Where(o => o.TicketTypeId == ticket.TicketTypeId).DefaultIfEmpty(null).Single();
+
+                if (auctionTicket == null)
+                    throw new NullReferenceException("Auction Ticket Type Not found, aborting!");
+
+                item.CostPerUnit = auctionTicket.CostPerUnit;
+                item.Description = auctionTicket.Description;
+                item.Quantity = ticket.Count;
+                result.Add(item);
+            }
+
+            return result;
+        }
+
+        private decimal CalculateTicketOwed(List<TicketLineItem> ticketLineItems)
+        {
+            return ticketLineItems.Sum(o => o.Subtotal);
+        }
+
+        private CheckOutError GenerateCheckOutError(Bidder bidder, string message)
+        {
+            var chkErr = new CheckOutError
+            {
+                BidderId = bidder.BidderId,
+                BidderFullName = bidder.FullName,
+                ErrorMessage = message
+            };
+
+            return chkErr;
+        }
+
+        private bool BidderHadTickets(List<Ticket> tickets)
+        {
+            return tickets.Count > 0;
+        }
+
+        private bool BidderHadAPaddle(List<Paddle> paddles)
+        {
+            return paddles.Count > 0;
+        }
+
+        private bool BidderParticipated(List<Paddle> paddles, List<Ticket> tickets)
+        {
+            return BidderHadTickets(tickets) || BidderHadAPaddle(paddles);
+        }
+
+        private CheckOut CreateCheckOutItem(Bidder bidder)
+        {
+            CheckOut result = new CheckOut();
+            result.BidderId = bidder.BidderId;
+                                    
+            result.TotalPaid = bidder.AmountPaid;
+            result.PaymentInfo = bidder.PaymentInfo;
+
+            return result;
+        }
+
+        private decimal CalculateBidOwed(List<Bid> bids)
+        {
+            decimal result;
+            // Amount owed from Bids
+            if (bids != null && bids.Count > 0)
+                result = bids.Select(o => o.TotalCost).Sum();
+            else result = 0.0m;
+
+            return result;
+        }
+
 
         // POST: Bidders/CheckOut/5
         [HttpPost, ActionName("CheckOut")]
